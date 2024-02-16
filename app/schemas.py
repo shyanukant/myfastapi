@@ -23,3 +23,8 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     id: int
     email: EmailStr
+    creaeted_at: datetime
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
