@@ -40,7 +40,7 @@
 						"source.fixAll": true
 					}
 				},
-				"python.formatting.provider": "black",
+				"python.formatting.provider": "autopep8",
 				"sqltools.connections": [
 					{
 						"name": "Local database",
