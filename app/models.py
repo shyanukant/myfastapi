@@ -13,7 +13,7 @@ class Post(Base):
     published = Column(Boolean, server_default='True')
     created_at = Column(TIMESTAMP(timezone=True), nullable=True, server_default=text('now()'))
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    owner = relationship("User", back_populates="posts")
+    owner = relationship("User")
 
 class User(Base):
     __tablename__='users'

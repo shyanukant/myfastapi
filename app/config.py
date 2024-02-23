@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     
     host: str = 'localhost'
-    port: int = 5432
+    # port: int = 5432
     user: str = 'admin'
     password: str = 'LocalPasswordOnly'
     database: str = 'postgres'
