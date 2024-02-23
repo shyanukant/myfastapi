@@ -6,6 +6,7 @@ from ..database import get_db
 from ..models import User
 from ..schemas import UserCreate, UserResponse
 
+
 router = APIRouter(
     prefix='/users',
     tags=["Users"]
