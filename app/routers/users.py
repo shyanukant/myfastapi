@@ -45,7 +45,7 @@ async def delete_user(id:int, db:Session = Depends(get_db)):
     db.commit()
     return {"message": f"User {id} deleted successfully"}
 
-router.put('/{id}', status_code=status.HTTP_200_OK, response_model=UserResponse)
+@router.put('/{id}', status_code=status.HTTP_200_OK, response_model=UserResponse)
 async def update_user(id:int, updated_user:UserCreate, db:Session = Depends(get_db)):
     user_query = db.query(User).filter(User.id==id)
     user = user_query.first()

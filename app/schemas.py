@@ -13,6 +13,7 @@ class PostCreate(PostBase):
 class PostRespone(PostBase):
     id : int
     created_at : datetime
+    owner_id : int
 
     class Config:
         orm_mode = True
