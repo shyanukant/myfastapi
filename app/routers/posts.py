@@ -1,9 +1,10 @@
 from fastapi import  Depends, HTTPException, status, Response, APIRouter
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List
 from ..database import  get_db
-from ..models import Post
-from ..schemas import PostCreate, PostRespone
+from ..models import Post, Vote
+from ..schemas import PostCreate, PostRespone, PostOutResponse
 from ..oauth2 import get_current_user
 
 router = APIRouter(
@@ -21,21 +22,23 @@ async def create_post(post: PostCreate, db:Session = Depends(get_db), current_us
 
 @router.get('/myposts', response_model=List[PostRespone])
 async def get_user_posts(db:Session = Depends(get_db), current_user: int = Depends(get_current_user)):
-    posts = db.query(Post).filter(Post.owner_id==current_user.id)
+    posts = db.query(Post, func.count(Vote.post_id).label("votes")).join(Vote, Post.id==Vote.post_id, isouter=True).group_by(Post.id).filter(Post.owner_id==current_user.id)
     if not posts:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Posts not exists")
     return posts
 
-@router.get('/', response_model=List[PostRespone])
-async def get_posts(db:Session = Depends(get_db), limit: int = 10, skip: int = 0, serach: str = ''):
-    posts = db.query(Post).filter(Post.title.contains(serach)).limit(limit).offset(skip).all()
+@router.get('/', response_model=List[PostOutResponse])
+async def get_posts(db:Session = Depends(get_db), limit: int = 10, skip: int = 0, search: str = ''):
+    # posts = db.query(Post).filter(Post.title.contains(search)).limit(limit).offset(skip).all()
+    posts = db.query(Post, func.count(Vote.post_id).label("votes")).join(Vote, Post.id==Vote.post_id, isouter=True).group_by(Post.id).filter(Post.title.contains(search)).limit(limit).offset(skip).all()
     if not posts:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Posts not exists")
     return posts
 
-@router.get('/{id}', response_model=PostRespone)
+@router.get('/{id}', response_model=PostOutResponse)
 async def get_post_by_id(id: int, db:Session = Depends(get_db)):
-    post = db.query(Post).filter(Post.id==id).first()
+    # post = db.query(Post).filter(Post.id==id).first()
+    post = db.query(Post, func.count(Vote.post).label("votes")).join(Vote, Post.id==Vote.post_id, isouter=True).group_by(Post.id).filter(Post.id==id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id} not found")
     return post

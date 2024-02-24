@@ -37,8 +37,14 @@ class PostRespone(PostBase):
     owner: UserResponse
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
+class PostOutResponse(BaseModel):
+    Post: PostRespone
+    votes: int
+
+    class Config:
+        from_attributes = True
 
 class VoteBase(BaseModel):
     post_id: int
