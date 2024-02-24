@@ -9,7 +9,7 @@ router = APIRouter(
     prefix="/votes",
     tags=["votes"],
 )
-
+# This route is used to vote on a post and unvote on a post by a user and only authenticated user can vote or unvote
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def votes(vote:VoteBase, db: Session = Depends(get_db), current_user:int = Depends(get_current_user)):
     post = db.query(Post).filter(Post.id == vote.post_id).first()

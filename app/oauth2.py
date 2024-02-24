@@ -14,6 +14,7 @@ SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
+# This function is used to create a token with user_id and expire time
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -21,6 +22,7 @@ def create_access_token(data: dict):
     encode_at = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encode_at
 
+# This function is used to verify the token and return the user_id
 def verify_token(token: str, credentials_exception):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -31,7 +33,8 @@ def verify_token(token: str, credentials_exception):
         return token_data
     except JWTError:
         raise credentials_exception
-
+    
+# This function is used to get the current user from the token
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, 
                                           detail="Could not validate credentials", 

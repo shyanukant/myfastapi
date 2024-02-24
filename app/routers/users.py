@@ -12,7 +12,7 @@ router = APIRouter(
     prefix='/users',
     tags=["Users"]
 )
-
+# This route is used to create a new user and add to the database
 @router.post('/create', status_code=status.HTTP_201_CREATED, response_model=UserResponse)
 async def create_user(user: UserCreate, db:Session = Depends(get_db)):
     hashed_password = hash_password(user.password)
@@ -23,6 +23,7 @@ async def create_user(user: UserCreate, db:Session = Depends(get_db)):
     db.refresh(new_user)
     return new_user
 
+# This route is used to get all users
 @router.get('/', status_code=status.HTTP_200_OK, 
             response_model=List[UserResponse])
 async def get_users(db:Session = Depends(get_db)):
@@ -31,6 +32,7 @@ async def get_users(db:Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Users not exists")
     return users
 
+# This route is used to get a user by id
 @router.get('/{id}', status_code=status.HTTP_200_OK, response_model=UserResponse)
 async def get_user(id:int, db:Session = Depends(get_db)):
     user = db.query(User).filter(User.id==id).first()
@@ -38,6 +40,7 @@ async def get_user(id:int, db:Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id: {id} not found")
     return user
 
+# This route is used to delete a user by id and only owner of the user can delete the user
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(id:int, db:Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.id != id:
@@ -49,6 +52,7 @@ async def delete_user(id:int, db:Session = Depends(get_db), current_user: User =
     db.commit()
     return {"message": f"User {id} deleted successfully"}
 
+# This route is used to update a user by id and only owner of the user can update the user
 @router.put('/{id}', status_code=status.HTTP_200_OK, response_model=UserResponse)
 async def update_user(id:int, updated_user:UserCreate, db:Session = Depends(get_db), 
                       current_user: User = Depends(get_current_user)):
