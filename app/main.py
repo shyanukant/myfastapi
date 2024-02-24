@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 # from .database import engine
 # from . import models
 from .routers.posts import router as post_router
@@ -10,7 +11,13 @@ from .routers.votes import router as vote_router
 # models.Base.metadata.create_all(bind=engine) # This line is commented because we are using alembic for migrations for creating tables in the database
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 # Include routers 
 app.include_router(post_router)
 app.include_router(user_router)
