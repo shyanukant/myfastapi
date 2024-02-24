@@ -4,7 +4,7 @@ from sqlalchemy import func
 from typing import List
 from ..database import  get_db
 from ..models import Post, Vote
-from ..schemas import PostCreate, PostRespone, PostOutResponse
+from ..schemas import PostCreate, PostResponse, PostOutResponse
 from ..oauth2 import get_current_user
 
 router = APIRouter(
@@ -12,7 +12,7 @@ router = APIRouter(
     tags=['Posts']
 )
 
-@router.post('/create', response_model=PostRespone)
+@router.post('/create', response_model=PostResponse)
 async def create_post(post: PostCreate, db:Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     new_post = Post(owner_id=current_user.id, **post.model_dump())
     db.add(new_post)
@@ -20,7 +20,7 @@ async def create_post(post: PostCreate, db:Session = Depends(get_db), current_us
     db.refresh(new_post)
     return new_post
 
-@router.get('/myposts', response_model=List[PostRespone])
+@router.get('/myposts', response_model=List[PostOutResponse])
 async def get_user_posts(db:Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     posts = db.query(Post, func.count(Vote.post_id).label("votes")).join(Vote, Post.id==Vote.post_id, isouter=True).group_by(Post.id).filter(Post.owner_id==current_user.id)
     if not posts:
@@ -38,7 +38,7 @@ async def get_posts(db:Session = Depends(get_db), limit: int = 10, skip: int = 0
 @router.get('/{id}', response_model=PostOutResponse)
 async def get_post_by_id(id: int, db:Session = Depends(get_db)):
     # post = db.query(Post).filter(Post.id==id).first()
-    post = db.query(Post, func.count(Vote.post).label("votes")).join(Vote, Post.id==Vote.post_id, isouter=True).group_by(Post.id).filter(Post.id==id).first()
+    post = db.query(Post, func.count(Vote.post_id).label("votes")).join(Vote, Post.id==Vote.post_id, isouter=True).group_by(Post.id).filter(Post.id==id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id: {id} not found")
     return post
@@ -59,7 +59,7 @@ async def delete_post(id: int, db:Session = Depends(get_db), current_user: int =
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@router.put('/{id}', response_model=PostRespone)
+@router.put('/{id}', response_model=PostResponse)
 async def update_post(id: int, updated_post:PostCreate, db:Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     post_query = db.query(Post).filter(Post.id==id)
     post = post_query.first()
