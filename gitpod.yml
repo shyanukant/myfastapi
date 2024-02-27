@@ -1,0 +1,23 @@
+# .gitpod.yml
+image:
+  file: Dockerfile
+
+tasks:
+  - name: PostgreSQL
+    before: >
+      sudo service postgresql start &&
+      sudo -u postgres createdb postgres &&
+      sudo -u postgres psql -c "CREATE USER admin WITH PASSWORD 'LocalPasswordOnly';" &&
+      sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE postgres TO admin;"
+    command: sleep infinity
+
+  - init: pip install -r requirements.txt
+
+vscode:
+  extensions:
+    - ms-python.python
+    - charliermarsh.ruff
+    - ms-python.black-formatter
+    - mtxr.sqltools
+    - mtxr.sqltools-driver-pg
+  
