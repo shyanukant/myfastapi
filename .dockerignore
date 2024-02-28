@@ -1,0 +1,20 @@
+# .dockerignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+.DS_Store
+.git
+.gitignore
+README.md
+LICENSE
+.vscode
+*.log
+*.csv
+*.json
+*.lock
+Dockerfile*
+docker-compose*
+node_modules
+npm-debug.log
