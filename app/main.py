@@ -17,11 +17,11 @@ app.add_middleware(
     allow_headers=["*"]
 )
 # Include routers 
-app.include_router(post_router)
 app.include_router(user_router)
-app.include_router(auth_router)
+app.include_router(post_router)
 app.include_router(vote_router)
+app.include_router(auth_router)
 
 @app.get('/')
 async def root():
-    return {"message": "Hello World in Production!!"}
+    return {"message": "Welecome to the Blog API. Go to /docs to see the documentation."}

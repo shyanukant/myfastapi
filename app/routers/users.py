@@ -1,5 +1,6 @@
 from fastapi import  Depends, HTTPException, status, APIRouter
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 from ..utils import hash_password
 from ..database import get_db
@@ -15,12 +16,15 @@ router = APIRouter(
 # This route is used to create a new user and add to the database
 @router.post('/create', status_code=status.HTTP_201_CREATED, response_model=UserResponse)
 async def create_user(user: UserCreate, db:Session = Depends(get_db)):
-    hashed_password = hash_password(user.password)
-    user.password = hashed_password
-    new_user = User(**user.model_dump())
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    try:
+        hashed_password = hash_password(user.password)
+        user.password = hashed_password
+        new_user = User(**user.model_dump())
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email or Phone number already exists")
     return new_user
 
 # This route is used to get all users
@@ -62,6 +66,9 @@ async def update_user(id:int, updated_user:UserCreate, db:Session = Depends(get_
     user = user_query.first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id: {id} not found")
-    user_query.update(updated_user.model_dump(), synchronize_session=False)
-    db.commit()
+    try:
+        user_query.update(updated_user.model_dump(), synchronize_session=False)
+        db.commit()
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email or Phone number already exists")
     return user_query.first()
