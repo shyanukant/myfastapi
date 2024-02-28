@@ -86,4 +86,4 @@ jobs:
           script: |
             cd app/src
             git pull
-            echo ${{ secrets.PROD_PASSWORD }} | sudo -S systemctl restart ${{ sercrets.SERVICE }}
+            echo ${{ secrets.PROD_PASSWORD }} | sudo -S systemctl restart ${{ secrets.SERVICE }}
