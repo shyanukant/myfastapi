@@ -8,7 +8,7 @@ from .routers.votes import router as vote_router
 # Create tables in the database
 # models.Base.metadata.create_all(bind=engine) # This line is commented because we are using alembic for migrations for creating tables in the database
 
-app = FastAPI()
+app = FastAPI(title="Blog API", description="A simple blog API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
