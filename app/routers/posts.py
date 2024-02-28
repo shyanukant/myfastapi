@@ -12,7 +12,7 @@ router = APIRouter(
     tags=['Posts']
 )
 # This route is used to create a new post
-@router.post('/create', response_model=PostResponse)
+@router.post('/create', response_model=PostResponse, status_code=status.HTTP_201_CREATED)
 async def create_post(post: PostCreate, db:Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     new_post = Post(owner_id=current_user.id, **post.model_dump())
     db.add(new_post)
@@ -56,7 +56,7 @@ async def delete_post(id: int, db:Session = Depends(get_db), current_user: int =
     
     if post.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
-                            details="Not allowed to delete this post. You are not owner of this post")
+                            detail="Not allowed to delete this post. You are not owner of this post")
     
     post_query.delete(synchronize_session=False)
     db.commit()
@@ -73,7 +73,7 @@ async def update_post(id: int, updated_post:PostCreate, db:Session = Depends(get
     
     if post.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
-                            details="Not allowed to update this post. You are not owner of this post")
+                            detail="Not allowed to update this post. You are not owner of this post")
 
     post_query.update(updated_post.model_dump(), synchronize_session=False)
     db.commit()

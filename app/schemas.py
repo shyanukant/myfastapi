@@ -5,6 +5,7 @@ from typing import Optional
 
 class UserCreate(BaseModel):
     email: EmailStr
+    phone: str
     password: str
 
 class UserResponse(BaseModel):
@@ -36,14 +37,14 @@ class PostResponse(PostBase):
     created_at : datetime
     owner: UserResponse
     
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 class PostOutResponse(BaseModel):
     Post: PostResponse
     votes: int
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 class VoteBase(BaseModel):
