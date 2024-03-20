@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from mangum import Mangum
 from fastapi.middleware.cors import CORSMiddleware
 # from .database import engine
 # from . import models
@@ -23,6 +24,8 @@ app.include_router(post_router)
 app.include_router(user_router)
 app.include_router(auth_router)
 app.include_router(vote_router)
+
+handler = Mangum(app)
 
 @app.get('/')
 async def root():
